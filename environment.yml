@@ -13,3 +13,10 @@ dependencies:
 - jupyter
 - jupyterlab
 - twisted
+- pydot
+- numdifftools
+- pip
+- pip:
+  - tensorflow # if no gpu
+  - tensorboard
+#  - tensorflow[and-cuda] # if want gpu support
