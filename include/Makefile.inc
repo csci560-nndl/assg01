@@ -61,15 +61,15 @@ $(assg_doc) : README.md
 ##
 .PHONY : unit-tests
 unit-tests :
-	python -m twisted.trial test_assg_tasks.test_hello_world
-	python -m twisted.trial test_assg_tasks.test_basic_sigmoid
-	python -m twisted.trial test_assg_tasks.test_sigmoid
-	python -m twisted.trial test_assg_tasks.test_sigmoid_grad
-	python -m twisted.trial test_assg_tasks.test_image2vector
-	python -m twisted.trial test_assg_tasks.test_normalize_rows
-	python -m twisted.trial test_assg_tasks.test_softmax
-	python -m twisted.trial test_assg_tasks.test_l2_loss
-	python -m twisted.trial test_assg_tasks.test_l1_loss
+	python -m unittest test_assg_tasks.test_hello_world
+	python -m unittest test_assg_tasks.test_basic_sigmoid
+	python -m unittest test_assg_tasks.test_sigmoid
+	python -m unittest test_assg_tasks.test_sigmoid_grad
+	python -m unittest test_assg_tasks.test_image2vector
+	python -m unittest test_assg_tasks.test_normalize_rows
+	python -m unittest test_assg_tasks.test_softmax
+	python -m unittest test_assg_tasks.test_l2_loss
+	python -m unittest test_assg_tasks.test_l1_loss
 	
 
 ## clean        : Remove auto-generated files for a completely
