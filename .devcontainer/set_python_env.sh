@@ -20,11 +20,11 @@ cat >> /root/.bashrc <<'EOF'
 
 # search for nvidia libraries and add to LD_LIBRARY_PATH if
 # nvidia / cuda support is installed
-LIBS=$(find /opt/$PYTHON_ENV -name "*.so*" | grep nvidia)
-if [ -n "$LIBS" ];
-then
-  export LD_LIBRARY_PATH=$(echo $LIBS | xargs dirname | sort -u | paste -d ":" -s -)
-fi
+#LIBS=$(find /opt/$PYTHON_ENV -name "*.so*" | grep nvidia)
+#if [ -n "$LIBS" ];
+#then
+#  export LD_LIBRARY_PATH=$(echo $LIBS | xargs dirname | sort -u | paste -d ":" -s -)
+#fi
 
 # activate the default virtual environment for assignments
 source /opt/$PYTHON_ENV/bin/activate
@@ -42,11 +42,11 @@ cat >> /home/$USERNAME/.bashrc <<'EOF'
 
 # search for nvidia libraries and add to LD_LIBRARY_PATH if
 # nvidia / cuda support is installed
-LIBS=$(find /opt/$PYTHON_ENV -name "*.so*" | grep nvidia)
-if [ -n "$LIBS" ];
-then
-  export LD_LIBRARY_PATH=$(echo $LIBS | xargs dirname | sort -u | paste -d ":" -s -)
-fi
+#LIBS=$(find /opt/$PYTHON_ENV -name "*.so*" | grep nvidia)
+#if [ -n "$LIBS" ];
+#then
+#  export LD_LIBRARY_PATH=$(echo $LIBS | xargs dirname | sort -u | paste -d ":" -s -)
+#fi
 
 # activate the default virtual environment for assignments
 source /opt/$PYTHON_ENV/bin/activate
@@ -57,3 +57,23 @@ EOF
 # install all required packages into virtual environment specified in requirements.txt
 source /opt/$PYTHON_ENV/bin/activate
 pip3 install -q -r ./requirements/requirements.txt
+
+# NOTE: official Tensorflow pip install instructions: https://tensorflow.org/install/pip
+# mention for GPU in virtual environment configurations you need to setup symbolic links
+# like the following.  This removes need to set the  LD_LIBRARY_PATH as we were doing
+# first command should create links to all nvidia so shared libraries in the /opt/base/lib/*/tensorflow
+# directory
+pushd $(dirname $(python -c 'print(__import__("tensorflow").__file__)'))
+ln -svf ../nvidia/*/lib/*.so* .
+popd
+
+# then a symbolic link to the ptxas executable in the virtual environment bin
+# directory, which may or may not really be needed in our assignment/project cases
+ln -sf $(find $(dirname $(dirname $(python -c "import nvidia.cuda_nvcc; print(nvidia.cuda_nvcc.__file__)"))/*/bin/) -name ptxas -print -quit) $VIRTUAL_ENV/bin/ptxas
+
+# the following are referenced in the Tensorflow documentation as simple ways to verify Tensorflow cpu and
+# gpu setup
+# verify tensorflow cpu setup works
+#python3 -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 100])))"
+# verify tensorflow detects gpu device
+#python3 -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
