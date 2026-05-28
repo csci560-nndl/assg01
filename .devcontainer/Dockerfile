@@ -3,7 +3,7 @@ FROM python:3.13
 
 # set a user to run the dev container code in and correct
 # map uid/gid into when using container
-ARG USERNAME=vscode
+ARG USERNAME
 ENV USERNAME=$USERNAME
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
@@ -28,7 +28,7 @@ RUN sed -i 's/Components: main/Components: main contrib/g' /etc/apt/sources.list
 #USER $USERNAME
 
 # create and manage default virtual environment for assignment work
-ARG PYTHON_ENV=assg
+ARG PYTHON_ENV
 ENV PYTHON_ENV=$PYTHON_ENV
 
 # setup default environment
