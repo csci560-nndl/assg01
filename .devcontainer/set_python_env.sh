@@ -20,11 +20,12 @@ cat >> /root/.bashrc <<'EOF'
 
 # search for nvidia libraries and add to LD_LIBRARY_PATH if
 # nvidia / cuda support is installed
-#LIBS=$(find /opt/$PYTHON_ENV -name "*.so*" | grep nvidia)
-#if [ -n "$LIBS" ];
-#then
-#  export LD_LIBRARY_PATH=$(echo $LIBS | xargs dirname | sort -u | paste -d ":" -s -)
-#fi
+# see: https://dev.to/metal3d/how-to-resolve-the-dlopen-problem-with-nvidia-and-pytorch-or-tensorflow-inside-a-virtual-env-181e
+LIBS=$(find /opt/$PYTHON_ENV -name "*.so*" | grep nvidia)
+if [ -n "$LIBS" ];
+then
+  export LD_LIBRARY_PATH=$(echo $LIBS | xargs dirname | sort -u | paste -d ":" -s -)
+fi
 
 # activate the default virtual environment for assignments
 source /opt/$PYTHON_ENV/bin/activate
@@ -42,11 +43,12 @@ cat >> /home/$USERNAME/.bashrc <<'EOF'
 
 # search for nvidia libraries and add to LD_LIBRARY_PATH if
 # nvidia / cuda support is installed
-#LIBS=$(find /opt/$PYTHON_ENV -name "*.so*" | grep nvidia)
-#if [ -n "$LIBS" ];
-#then
-#  export LD_LIBRARY_PATH=$(echo $LIBS | xargs dirname | sort -u | paste -d ":" -s -)
-#fi
+# see: https://dev.to/metal3d/how-to-resolve-the-dlopen-problem-with-nvidia-and-pytorch-or-tensorflow-inside-a-virtual-env-181e
+LIBS=$(find /opt/$PYTHON_ENV -name "*.so*" | grep nvidia)
+if [ -n "$LIBS" ];
+then
+  export LD_LIBRARY_PATH=$(echo $LIBS | xargs dirname | sort -u | paste -d ":" -s -)
+fi
 
 # activate the default virtual environment for assignments
 source /opt/$PYTHON_ENV/bin/activate
@@ -63,13 +65,19 @@ pip3 install -q -r ./requirements/requirements.txt
 # like the following.  This removes need to set the  LD_LIBRARY_PATH as we were doing
 # first command should create links to all nvidia so shared libraries in the /opt/base/lib/*/tensorflow
 # directory
-pushd $(dirname $(python -c 'print(__import__("tensorflow").__file__)'))
-ln -svf ../nvidia/*/lib/*.so* .
-popd
+# NOTE: both of these were having problems on tensorflow 2.21.  These basically work to
+# add symbolic links into the /opt/base/lib/python*/site-packages/tensorflow directory, but I find that
+# I still need to add that directory to the LD_LIBRARY_PATH, so the above solution to just set the
+# library path in the bashrc is currently the cleaner way to go
+#pushd $(dirname $(python -c 'print(__import__("tensorflow").__file__)'))
+#ln -svf ../nvidia/*/lib*/*.so* .
+#ln -svf ../nvidia/*/*/lib*/*.so* .
+#popd
 
 # then a symbolic link to the ptxas executable in the virtual environment bin
 # directory, which may or may not really be needed in our assignment/project cases
-ln -sf $(find $(dirname $(dirname $(python -c "import nvidia.cuda_nvcc; print(nvidia.cuda_nvcc.__file__)"))/*/bin/) -name ptxas -print -quit) $VIRTUAL_ENV/bin/ptxas
+#ln -sf $(find $(dirname $(dirname $(python -c "import nvidia.cuda_nvcc; print(nvidia.cuda_nvcc.__file__)"))/*/bin/) -name ptxas -print -quit) $VIRTUAL_ENV/bin/ptxas
+#ln -sf $(find $VIRTUAL_ENV -name ptxas -print) $VIRTUAL_ENV/bin/ptxas
 
 # the following are referenced in the Tensorflow documentation as simple ways to verify Tensorflow cpu and
 # gpu setup
